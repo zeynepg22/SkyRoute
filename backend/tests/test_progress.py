@@ -1,6 +1,6 @@
 from sqlmodel import Session
-from database import engine
-from services import calculate_course_progress
+from core.database import engine
+from services.progress_service import calculate_course_progress
 
 
 def test_calculate_course_progress():

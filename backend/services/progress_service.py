@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from models import Lesson, LessonProgress
+from models.db_models import Lesson, LessonProgress
 
 
 def calculate_course_progress(session: Session, user_id: int, course_id: int) -> float:

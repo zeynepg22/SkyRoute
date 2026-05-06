@@ -2,8 +2,8 @@ import pytest
 from sqlmodel import Session
 from sqlalchemy.exc import IntegrityError
 
-from database import engine
-from models import Enrollment, LessonProgress
+from core.database import engine
+from models.db_models import Enrollment, LessonProgress
 
 
 def test_duplicate_enrollment_is_not_allowed():

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from database import create_db_and_tables
-import models
+from core.database import create_db_and_tables
+import models.db_models
 
 app = FastAPI(title="SkyRoute API")
 

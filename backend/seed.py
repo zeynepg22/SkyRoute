@@ -1,8 +1,8 @@
 from sqlmodel import Session, select
 from passlib.context import CryptContext
 
-from database import engine
-from models import (
+from core.database import engine
+from models.db_models import (
     Role,
     User,
     Course,
@@ -14,7 +14,7 @@ from models import (
     BackupCode,
     AuditLog,
 )
-from services import calculate_course_progress
+from services.progress_service import calculate_course_progress
 
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

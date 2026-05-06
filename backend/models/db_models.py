@@ -1,8 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import UniqueConstraint
 
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 class Role(SQLModel, table=True):
     __tablename__ = "roles"
@@ -22,7 +24,7 @@ class User(SQLModel, table=True):
     password_hash: str
     role_id: int = Field(foreign_key="roles.id", index=True)
     is_active: bool = Field(default=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
     role: Optional[Role] = Relationship(back_populates="users")
     courses: List["Course"] = Relationship(back_populates="instructor")
@@ -43,7 +45,7 @@ class Course(SQLModel, table=True):
     category: str = Field(index=True, max_length=100)
     instructor_id: int = Field(foreign_key="users.id", index=True)
     is_published: bool = Field(default=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
     instructor: Optional[User] = Relationship(back_populates="courses")
     lessons: List["Lesson"] = Relationship(back_populates="course")
@@ -76,7 +78,7 @@ class Enrollment(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id", index=True)
     course_id: int = Field(foreign_key="courses.id", index=True)
-    enrolled_at: datetime = Field(default_factory=datetime.utcnow)
+    enrolled_at: datetime = Field(default_factory=utc_now)
 
     user: Optional[User] = Relationship(back_populates="enrollments")
     course: Optional[Course] = Relationship(back_populates="enrollments")
@@ -92,7 +94,7 @@ class LessonProgress(SQLModel, table=True):
     user_id: int = Field(foreign_key="users.id", index=True)
     lesson_id: int = Field(foreign_key="lessons.id", index=True)
     is_completed: bool = Field(default=True)
-    completed_at: datetime = Field(default_factory=datetime.utcnow)
+    completed_at: datetime = Field(default_factory=utc_now)
 
     user: Optional[User] = Relationship(back_populates="lesson_progress")
     lesson: Optional[Lesson] = Relationship(back_populates="progress_records")
@@ -108,7 +110,7 @@ class SocialAccount(SQLModel, table=True):
     user_id: int = Field(foreign_key="users.id", index=True)
     provider: str = Field(index=True, max_length=50)
     provider_user_id: str = Field(max_length=255)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
     user: Optional[User] = Relationship(back_populates="social_accounts")
 
@@ -124,7 +126,7 @@ class TwoFactorMethod(SQLModel, table=True):
     method_type: str = Field(index=True, max_length=50)
     is_enabled: bool = Field(default=False)
     secret_value: Optional[str] = Field(default=None)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
     user: Optional[User] = Relationship(back_populates="two_factor_methods")
 
@@ -136,8 +138,7 @@ class BackupCode(SQLModel, table=True):
     user_id: int = Field(foreign_key="users.id", index=True)
     code_hash: str
     is_used: bool = Field(default=False)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-
+    created_at: datetime = Field(default_factory=utc_now)
     user: Optional[User] = Relationship(back_populates="backup_codes")
 
 
@@ -149,6 +150,6 @@ class AuditLog(SQLModel, table=True):
     action: str = Field(index=True, max_length=100)
     entity_type: str = Field(index=True, max_length=100)
     entity_id: Optional[int] = Field(default=None, index=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
     user: Optional[User] = Relationship(back_populates="audit_logs")
