@@ -11,7 +11,7 @@ import StudentDashboard from "./pages/StudentDashboard"
 import InstructorDashboard from "./pages/InstructorDashboard"
 import AdminDashboard from "./pages/AdminDashboard"
 
-import ProtectedRoute from "./components/ProtectedRoute"
+import ProtectedRoute from "./components/ProtectedRoute.jsx"
 
 function App() {
   return (

@@ -1,26 +1,26 @@
 from fastapi import FastAPI
-from core.database import create_db_and_tables
-import models.db_models
+from fastapi.middleware.cors import CORSMiddleware
 
-from routers.courses import router as courses_router
-from routers.lessons import router as lessons_router
-
-from routers.enrollments import router as enrollments_router
-from routers.progress import router as progress_router
+from routers import courses, lessons, enrollments, progress
 
 app = FastAPI(title="SkyRoute API")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
-
+app.include_router(courses.router)
+app.include_router(lessons.router)
+app.include_router(enrollments.router)
+app.include_router(progress.router)
 
 @app.get("/")
 def root():
-    return {"message": "SkyRoute API is running"}
-
-app.include_router(courses_router) 
-app.include_router(lessons_router)
-app.include_router(enrollments_router)
-app.include_router(progress_router)
+    return {"message": "SkyRoute backend is running"}

@@ -54,7 +54,7 @@ def seed_database():
         )
 
         instructor = User(
-            full_name="Instructor User",
+            full_name="SkyRoute Instructor",
             email="instructor@skyroute.com",
             password_hash=hash_password("Instructor123!"),
             role_id=instructor_role.id,
@@ -79,62 +79,162 @@ def seed_database():
         session.refresh(student)
 
         course_1 = Course(
-            title="Full-Stack Web Development with FastAPI and React",
-            description="Learn how to build a modern full-stack web application using FastAPI, PostgreSQL, and React.",
-            category="Web Development",
+            title="React JS - Complete Guide",
+            description="Learn React JS from beginner to advanced level with practical examples.",
+            category="Development",
             instructor_id=instructor.id,
             is_published=True,
         )
 
         course_2 = Course(
-            title="Database Design Fundamentals",
-            description="Learn relational database design, normalization, SQLModel relationships, and PostgreSQL basics.",
-            category="Database",
+            title="Python for Data Science",
+            description="Learn Python, data analysis, visualization, and data science fundamentals.",
+            category="Data Science",
             instructor_id=instructor.id,
             is_published=True,
         )
 
-        session.add(course_1)
-        session.add(course_2)
+        course_3 = Course(
+            title="UI/UX Design Fundamentals",
+            description="Learn user interface design, user experience principles, and modern design basics.",
+            category="Design",
+            instructor_id=instructor.id,
+            is_published=True,
+        )
+
+        course_4 = Course(
+            title="Digital Marketing Masterclass",
+            description="Learn SEO, branding, social media marketing, and digital campaign strategies.",
+            category="Marketing",
+            instructor_id=instructor.id,
+            is_published=True,
+        )
+
+        course_5 = Course(
+            title="Business Strategy Basics",
+            description="Learn business planning, strategy, leadership, and growth fundamentals.",
+            category="Business",
+            instructor_id=instructor.id,
+            is_published=True,
+        )
+
+        course_6 = Course(
+            title="Personal Growth Bootcamp",
+            description="Improve mindset, focus, productivity, and personal development skills.",
+            category="Growth",
+            instructor_id=instructor.id,
+            is_published=True,
+        )
+
+        session.add_all([
+            course_1,
+            course_2,
+            course_3,
+            course_4,
+            course_5,
+            course_6,
+        ])
+
         session.commit()
 
-        session.refresh(course_1)
-        session.refresh(course_2)
+        for course in [
+            course_1,
+            course_2,
+            course_3,
+            course_4,
+            course_5,
+            course_6,
+        ]:
+            session.refresh(course)
 
         lessons = [
             Lesson(
                 course_id=course_1.id,
-                title="Introduction to Full-Stack Architecture",
-                content="This lesson explains how frontend, backend, and database layers work together.",
-                video_url="https://www.youtube.com/embed/0sOvCWFmrtA",
+                title="Introduction to React",
+                content="Learn the basics of React components and JSX.",
+                video_url="https://www.youtube.com/embed/SqcY0GlETPk",
                 order_index=1,
             ),
             Lesson(
                 course_id=course_1.id,
-                title="Building REST APIs with FastAPI",
-                content="This lesson introduces REST API development with FastAPI.",
-                video_url="https://www.youtube.com/embed/7t2alSnE2-I",
+                title="React Hooks",
+                content="Learn useState and useEffect hooks.",
+                video_url="https://www.youtube.com/embed/O6P86uwfdR0",
                 order_index=2,
             ),
-            Lesson(
-                course_id=course_1.id,
-                title="Connecting React to Backend APIs",
-                content="This lesson explains how React fetches data from backend endpoints.",
-                video_url="https://www.youtube.com/embed/w7ejDZ8SWv8",
-                order_index=3,
-            ),
+
             Lesson(
                 course_id=course_2.id,
-                title="Relational Database Concepts",
-                content="This lesson explains tables, primary keys, foreign keys, and relationships.",
-                video_url="https://www.youtube.com/embed/HXV3zeQKqGY",
+                title="Python Basics",
+                content="Introduction to Python programming.",
+                video_url="https://www.youtube.com/embed/kqtD5dpn9C8",
                 order_index=1,
             ),
             Lesson(
                 course_id=course_2.id,
-                title="Normalization and Data Integrity",
-                content="This lesson explains normalization, constraints, and database consistency.",
-                video_url="https://www.youtube.com/embed/GFQaEYEc8_8",
+                title="Data Analysis Fundamentals",
+                content="Learn NumPy and pandas basics.",
+                video_url="https://www.youtube.com/embed/r-uOLxNrNk8",
+                order_index=2,
+            ),
+
+            Lesson(
+                course_id=course_3.id,
+                title="UI Design Basics",
+                content="Learn layout, colors, and typography.",
+                video_url="https://www.youtube.com/embed/c9Wg6Cb_YlU",
+                order_index=1,
+            ),
+            Lesson(
+                course_id=course_3.id,
+                title="UX Principles",
+                content="Learn user-centered design principles.",
+                video_url="https://www.youtube.com/embed/Ovj4hFxko7c",
+                order_index=2,
+            ),
+
+            Lesson(
+                course_id=course_4.id,
+                title="Marketing Fundamentals",
+                content="Learn the basics of digital marketing.",
+                video_url="https://www.youtube.com/embed/nU-IIXBWlS4",
+                order_index=1,
+            ),
+            Lesson(
+                course_id=course_4.id,
+                title="SEO and Branding",
+                content="Learn search engine optimization and branding.",
+                video_url="https://www.youtube.com/embed/DvwS7cV9GmQ",
+                order_index=2,
+            ),
+
+            Lesson(
+                course_id=course_5.id,
+                title="Business Planning",
+                content="Learn strategic business planning.",
+                video_url="https://www.youtube.com/embed/81ghhGjpMVQ",
+                order_index=1,
+            ),
+            Lesson(
+                course_id=course_5.id,
+                title="Leadership Skills",
+                content="Learn team management and leadership.",
+                video_url="https://www.youtube.com/embed/18Uq3m7qTSo",
+                order_index=2,
+            ),
+
+            Lesson(
+                course_id=course_6.id,
+                title="Mindset and Focus",
+                content="Improve your productivity and focus.",
+                video_url="https://www.youtube.com/embed/ZXsQAXx_ao0",
+                order_index=1,
+            ),
+            Lesson(
+                course_id=course_6.id,
+                title="Building Better Habits",
+                content="Learn consistency and growth habits.",
+                video_url="https://www.youtube.com/embed/75d_29QWELk",
                 order_index=2,
             ),
         ]
@@ -168,93 +268,6 @@ def seed_database():
         session.add(progress_1)
         session.add(progress_2)
 
-        social_accounts = [
-            SocialAccount(
-                user_id=student.id,
-                provider="google",
-                provider_user_id="google_student_001",
-            ),
-            SocialAccount(
-                user_id=student.id,
-                provider="github",
-                provider_user_id="github_student_001",
-            ),
-            SocialAccount(
-                user_id=student.id,
-                provider="linkedin",
-                provider_user_id="linkedin_student_001",
-            ),
-            SocialAccount(
-                user_id=student.id,
-                provider="facebook",
-                provider_user_id="facebook_student_001",
-            ),
-        ]
-
-        two_factor_methods = [
-            TwoFactorMethod(
-                user_id=student.id,
-                method_type="totp",
-                is_enabled=True,
-                secret_value="sample_totp_secret",
-            ),
-            TwoFactorMethod(
-                user_id=student.id,
-                method_type="email_otp",
-                is_enabled=True,
-                secret_value="student@skyroute.com",
-            ),
-            TwoFactorMethod(
-                user_id=student.id,
-                method_type="backup_codes",
-                is_enabled=True,
-                secret_value=None,
-            ),
-            TwoFactorMethod(
-                user_id=student.id,
-                method_type="trusted_device",
-                is_enabled=True,
-                secret_value="sample_device_fingerprint",
-            ),
-        ]
-
-        backup_codes = [
-            BackupCode(user_id=student.id, code_hash=hash_password("BACKUP-001")),
-            BackupCode(user_id=student.id, code_hash=hash_password("BACKUP-002")),
-            BackupCode(user_id=student.id, code_hash=hash_password("BACKUP-003")),
-        ]
-
-        audit_logs = [
-            AuditLog(
-                user_id=admin.id,
-                action="CREATE_ROLE",
-                entity_type="role",
-                entity_id=admin_role.id,
-            ),
-            AuditLog(
-                user_id=instructor.id,
-                action="CREATE_COURSE",
-                entity_type="course",
-                entity_id=course_1.id,
-            ),
-            AuditLog(
-                user_id=student.id,
-                action="ENROLL_COURSE",
-                entity_type="course",
-                entity_id=course_1.id,
-            ),
-            AuditLog(
-                user_id=student.id,
-                action="COMPLETE_LESSON",
-                entity_type="lesson",
-                entity_id=lessons[0].id,
-            ),
-        ]
-
-        session.add_all(social_accounts)
-        session.add_all(two_factor_methods)
-        session.add_all(backup_codes)
-        session.add_all(audit_logs)
         session.commit()
 
         progress_percentage = calculate_course_progress(

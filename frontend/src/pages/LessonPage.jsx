@@ -1,66 +1,98 @@
+import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import { lessonApi, progressApi } from "../services/api"
+
+const courseVideos = {
+  1: "https://www.youtube.com/embed/SqcY0GlETPk",
+  2: "https://www.youtube.com/embed/LHBE6Q9XlzI",
+  3: "https://www.youtube.com/embed/c9Wg6Cb_YlU",
+  4: "https://www.youtube.com/embed/nU-IIXBWlS4",
+  5: "https://www.youtube.com/embed/o7Ik1OB4TaE",
+  6: "https://www.youtube.com/embed/ZXsQAXx_ao0",
+}
 
 export default function LessonPage() {
   const { id } = useParams()
 
-  const lessons = {
-    1: {
-      title: "React Introduction Lesson",
-      description:
-        "Learn the fundamentals of React, JSX, components, hooks, and modern frontend development.",
-      video: "https://www.youtube.com/embed/SqcY0GlETPk",
-      duration: "12 min",
-      course: "React Masterclass",
-    },
+  const [lesson, setLesson] = useState(null)
+  const [courseLessons, setCourseLessons] = useState([])
+  const [progress, setProgress] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
 
-    2: {
-      title: "Python for Data Science",
-      description:
-        "Explore Python fundamentals, data analysis, machine learning basics, and real-world datasets.",
-      video: "https://www.youtube.com/embed/LHBE6Q9XlzI",
-      duration: "18 min",
-      course: "Python Bootcamp",
-    },
+  useEffect(() => {
+    async function fetchLessonData() {
+      try {
+        setLoading(true)
 
-    3: {
-      title: "UI/UX Design Fundamentals",
-      description:
-        "Understand user experience, interface design principles, wireframing, and visual hierarchy.",
-      video: "https://www.youtube.com/embed/c9Wg6Cb_YlU",
-      duration: "20 min",
-      course: "UI/UX Design",
-    },
+        const courseId = id
+        const lessons = await lessonApi.getLessonsByCourse(courseId)
 
-    4: {
-      title: "Digital Marketing Basics",
-      description:
-        "Learn SEO, social media strategy, branding, audience targeting, and marketing campaigns.",
-      video: "https://www.youtube.com/embed/JghrmfcukOs",
-      duration: "16 min",
-      course: "Marketing Masterclass",
-    },
+        setCourseLessons(lessons)
 
-    5: {
-      title: "Business Strategy Essentials",
-      description:
-        "Master strategic planning, leadership, competitive analysis, and business growth techniques.",
-      video: "https://www.youtube.com/embed/o7Ik1OB4TaE",
-      duration: "14 min",
-      course: "Business Strategy",
-    },
+        if (lessons.length > 0) {
+          setLesson(lessons[0])
+        } else {
+          setLesson(null)
+        }
 
-    6: {
-      title: "Personal Growth & Productivity",
-      description:
-        "Improve focus, discipline, productivity habits, mindset, and personal development skills.",
-      video: "https://www.youtube.com/embed/Lp7E973zozc",
-      duration: "15 min",
-      course: "Growth Bootcamp",
-    },
+        const progressData = await progressApi.getProgress(courseId)
+        setProgress(progressData.progress || 0)
+      } catch (err) {
+        setError("Lesson could not be loaded. Please check backend connection.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchLessonData()
+  }, [id])
+
+  async function handleCompleteLesson() {
+    try {
+      if (!lesson) return
+
+      await progressApi.completeLesson(lesson.id)
+      setSuccessMessage("Lesson marked as complete.")
+
+      const progressData = await progressApi.getProgress(id)
+      setProgress(progressData.progress || 0)
+    } catch (err) {
+      setError("Lesson could not be completed.")
+    }
   }
 
-  const lesson = lessons[id] || lessons[1]
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-[#fff0f7] p-8">
+          <p className="text-gray-500 text-lg">Loading lesson...</p>
+        </div>
+      </>
+    )
+  }
+
+  if (error || !lesson) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-[#fff0f7] p-8">
+          <Link to="/courses" className="text-pink-500 font-bold">
+            ← Back to Courses
+          </Link>
+
+          <p className="text-red-500 font-bold mt-8">
+            {error || "Lesson not found."}
+          </p>
+        </div>
+      </>
+    )
+  }
+
+  const video = courseVideos[id] || "https://www.youtube.com/embed/SqcY0GlETPk"
 
   return (
     <>
@@ -81,7 +113,7 @@ export default function LessonPage() {
                 <div className="aspect-video">
                   <iframe
                     className="w-full h-full"
-                    src={lesson.video}
+                    src={video}
                     title={lesson.title}
                     allowFullScreen
                   ></iframe>
@@ -89,7 +121,7 @@ export default function LessonPage() {
 
                 <div className="p-8">
                   <span className="bg-pink-100 text-pink-500 px-4 py-2 rounded-full text-sm font-bold">
-                    {lesson.course}
+                    Course ID: {id}
                   </span>
 
                   <h1 className="text-4xl font-extrabold mt-5 mb-4 leading-tight">
@@ -97,7 +129,9 @@ export default function LessonPage() {
                   </h1>
 
                   <p className="text-gray-600 text-lg leading-8 mb-8">
-                    {lesson.description}
+                    {lesson.content ||
+                      lesson.description ||
+                      "This lesson introduces the main concepts with practical examples."}
                   </p>
 
                   <div className="flex items-center gap-6 mb-8">
@@ -106,7 +140,7 @@ export default function LessonPage() {
                     </span>
 
                     <span className="text-gray-500">
-                      Duration: {lesson.duration}
+                      Duration: {lesson.duration || "15 min"}
                     </span>
 
                     <span className="text-gray-500">
@@ -114,7 +148,16 @@ export default function LessonPage() {
                     </span>
                   </div>
 
-                  <button className="bg-pink-500 text-white px-8 py-4 rounded-2xl font-bold hover:bg-pink-600 transition shadow-lg">
+                  {successMessage && (
+                    <p className="text-green-600 font-bold mb-5">
+                      {successMessage}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={handleCompleteLesson}
+                    className="bg-pink-500 text-white px-8 py-4 rounded-2xl font-bold hover:bg-pink-600 transition shadow-lg"
+                  >
                     Mark as Complete
                   </button>
                 </div>
@@ -127,12 +170,15 @@ export default function LessonPage() {
               </h2>
 
               <div className="space-y-4">
-                {Object.entries(lessons).map(([lessonId, item]) => (
-                  <Link
-                    key={lessonId}
-                    to={`/lesson/${lessonId}`}
-                    className={`flex items-center justify-between rounded-2xl p-5 transition ${
-                      lessonId == id
+                {courseLessons.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setLesson(item)
+                      setSuccessMessage("")
+                    }}
+                    className={`w-full text-left flex items-center justify-between rounded-2xl p-5 transition ${
+                      item.id === lesson.id
                         ? "bg-pink-500 text-white"
                         : "bg-pink-50 hover:bg-pink-100"
                     }`}
@@ -144,17 +190,17 @@ export default function LessonPage() {
 
                       <p
                         className={`text-sm ${
-                          lessonId == id
+                          item.id === lesson.id
                             ? "text-pink-100"
                             : "text-gray-500"
                         }`}
                       >
-                        {item.duration}
+                        {item.duration || "15 min"}
                       </p>
                     </div>
 
                     <span className="font-bold">▶</span>
-                  </Link>
+                  </button>
                 ))}
               </div>
 
@@ -165,12 +211,15 @@ export default function LessonPage() {
                   </span>
 
                   <span className="text-pink-500 font-bold">
-                    60%
+                    {progress}%
                   </span>
                 </div>
 
                 <div className="w-full h-4 bg-pink-100 rounded-full overflow-hidden">
-                  <div className="h-4 bg-pink-500 rounded-full w-[60%]"></div>
+                  <div
+                    className="h-4 bg-pink-500 rounded-full"
+                    style={{ width: `${progress}%` }}
+                  ></div>
                 </div>
               </div>
             </div>
