@@ -181,8 +181,8 @@ def seed_database():
             ),
             SocialAccount(
                 user_id=student.id,
-                provider="discord",
-                provider_user_id="discord_student_001",
+                provider="linkedin",
+                provider_user_id="linkedin_student_001",
             ),
             SocialAccount(
                 user_id=student.id,
