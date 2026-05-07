@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # Veritabanı Servisi
+  db:
+    image: postgres:15
+    container_name: skyroute_db
+    environment:
+      POSTGRES_USER: dila
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: skyroute
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # FastAPI Uygulama Servisi
+  app:
+    build: .
+    container_name: skyroute_app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://dila:12345@db:5432/skyroute
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
