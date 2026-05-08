@@ -1,26 +1,35 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from core.database import create_db_and_tables
+import models.db_models
 
 from routers import courses, lessons, enrollments, progress
 
-app = FastAPI(title="SkyRoute API")
+from routers.auth_router import router as auth_router
+from routers.admin_router import router as admin_router
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+from middleware.security import setup_security
+
+app = FastAPI(
+    title="SkyRoute API",
+    description="Online Course Platform — Mini Udemy",
+    version="1.0.0",
 )
 
+setup_security(app)
+
+app.include_router(auth_router)
+app.include_router(admin_router)
 app.include_router(courses.router)
 app.include_router(lessons.router)
 app.include_router(enrollments.router)
 app.include_router(progress.router)
 
+
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
+
+
 @app.get("/")
 def root():
-    return {"message": "SkyRoute backend is running"}
+    return {"message": "SkyRoute API is running"}
