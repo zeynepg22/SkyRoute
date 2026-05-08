@@ -1,11 +1,7 @@
-"""
-Authentication router.
-Endpoints: register, login, refresh, me, 2FA setup/verify, social login.
-"""
-
 import os
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from fastapi.responses import RedirectResponse
+from middleware.security import limiter
 from sqlmodel import Session, select
 
 from core.database import get_session
@@ -59,7 +55,8 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 # REGISTER
 # ===================================================================
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=TokenResponse)
-def register(body: RegisterRequest, session: Session = Depends(get_session)):
+@limiter.limit("10/minute")
+def register(request: Request, body: RegisterRequest, session: Session = Depends(get_session)):
     existing = session.exec(select(User).where(User.email == body.email)).first()
     if existing:
         raise HTTPException(
@@ -94,7 +91,8 @@ def register(body: RegisterRequest, session: Session = Depends(get_session)):
 # LOGIN
 # ===================================================================
 @router.post("/login")
-def login(body: LoginRequest, session: Session = Depends(get_session)):
+@limiter.limit("5/minute")
+def login(request: Request, body: LoginRequest, session: Session = Depends(get_session)):
     user = session.exec(select(User).where(User.email == body.email)).first()
     if not user or not verify_password(body.password, user.password_hash):
         raise HTTPException(
@@ -132,7 +130,8 @@ def login(body: LoginRequest, session: Session = Depends(get_session)):
 # VERIFY 2FA
 # ===================================================================
 @router.post("/verify-2fa", response_model=TokenResponse)
-def verify_2fa(body: Verify2FARequest, session: Session = Depends(get_session)):
+@limiter.limit("5/minute")
+def verify_2fa(request: Request, body: Verify2FARequest, session: Session = Depends(get_session)):
     try:
         payload = decode_token(body.temp_token)
         if payload.get("type") != "2fa_temp":
@@ -176,7 +175,8 @@ def verify_2fa(body: Verify2FARequest, session: Session = Depends(get_session)):
 # SEND EMAIL OTP
 # ===================================================================
 @router.post("/send-email-otp")
-def send_otp_endpoint(body: dict, session: Session = Depends(get_session)):
+@limiter.limit("3/minute")
+def send_otp_endpoint(request: Request, body: dict, session: Session = Depends(get_session)):
     """Send an email OTP. Expects {"temp_token": "..."}."""
     temp_token = body.get("temp_token", "")
     try:
