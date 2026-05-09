@@ -8,3 +8,5 @@ backend/.env
 .DS_Store
 .sixth/
 .idea/
+node_modules/
+frontend/node_modules/

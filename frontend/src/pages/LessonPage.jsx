@@ -27,19 +27,19 @@ export default function LessonPage() {
       try {
         setLoading(true)
 
-        const courseId = id
-        const lessons = await lessonApi.getLessonsByCourse(courseId)
+        const selectedLesson = await lessonApi.getLesson(id)
 
+        setLesson(selectedLesson)
+
+        const lessons = await lessonApi.getLessonsByCourse(selectedLesson.course_id)
         setCourseLessons(lessons)
 
-        if (lessons.length > 0) {
-          setLesson(lessons[0])
-        } else {
-          setLesson(null)
+        try {
+          const progressData = await progressApi.getProgress(selectedLesson.course_id)
+          setProgress(progressData.progress || 0)
+        } catch {
+          setProgress(0)
         }
-
-        const progressData = await progressApi.getProgress(courseId)
-        setProgress(progressData.progress || 0)
       } catch (err) {
         setError("Lesson could not be loaded. Please check backend connection.")
       } finally {
@@ -92,7 +92,7 @@ export default function LessonPage() {
     )
   }
 
-  const video = courseVideos[id] || "https://www.youtube.com/embed/SqcY0GlETPk"
+  const video = lesson.video_url || courseVideos[id] || "https://www.youtube.com/embed/SqcY0GlETPk"
 
   return (
     <>

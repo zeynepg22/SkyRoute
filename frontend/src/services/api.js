@@ -1,12 +1,15 @@
 const API_BASE_URL = "http://localhost:8000";
 
 export async function apiRequest(endpoint, options = {}) {
+  const token = localStorage.getItem("access_token");
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
-    ...options,
   });
 
   if (!response.ok) {
@@ -22,6 +25,8 @@ export const courseApi = {
 };
 
 export const lessonApi = {
+  getLesson: (lessonId) => apiRequest(`/lessons/${lessonId}`),
+
   getLessonsByCourse: (courseId) =>
     apiRequest(`/lessons/course/${courseId}`),
 };

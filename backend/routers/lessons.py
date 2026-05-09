@@ -52,3 +52,16 @@ def get_course_lessons(course_id: int):
         ).all()
 
         return lessons
+    
+@router.get("/{lesson_id}")
+def get_lesson(lesson_id: int):
+    with Session(engine) as session:
+        lesson = session.get(Lesson, lesson_id)
+
+        if not lesson:
+            raise HTTPException(
+                status_code=404,
+                detail="Lesson not found"
+            )
+
+        return lesson
