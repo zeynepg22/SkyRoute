@@ -1,3 +1,5 @@
+from fastapi import Depends
+from auth.dependencies import get_current_user
 from fastapi import APIRouter, HTTPException
 from sqlmodel import Session, select
 
@@ -5,7 +7,8 @@ from core.database import engine
 from models.db_models import (
     Lesson,
     LessonProgress,
-    Course
+    Course,
+    User
 )
 
 router = APIRouter(
@@ -15,9 +18,11 @@ router = APIRouter(
 
 
 @router.post("/complete/{lesson_id}")
-def complete_lesson(lesson_id: int):
-
-    student_id = 3
+def complete_lesson(
+    lesson_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    student_id = current_user.id
 
     with Session(engine) as session:
 
@@ -56,9 +61,11 @@ def complete_lesson(lesson_id: int):
 
 
 @router.get("/{course_id}")
-def get_course_progress(course_id: int):
-
-    student_id = 3
+def get_course_progress(
+    course_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    student_id = current_user.id
 
     with Session(engine) as session:
 

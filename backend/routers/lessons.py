@@ -1,8 +1,11 @@
+from fastapi import Depends
+from auth.dependencies import require_role
 from fastapi import APIRouter, HTTPException
 from sqlmodel import Session, select
 
 from core.database import engine
 from models.db_models import Lesson, Course
+from models.db_models import User
 
 router = APIRouter(
     prefix="/lessons",
@@ -11,7 +14,10 @@ router = APIRouter(
 
 
 @router.post("/")
-def create_lesson(lesson: Lesson):
+def create_lesson(
+    lesson: Lesson,
+    current_user: User = Depends(require_role("instructor", "admin"))
+):
     with Session(engine) as session:
 
         course = session.get(Course, lesson.course_id)

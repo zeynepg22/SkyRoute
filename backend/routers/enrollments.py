@@ -1,3 +1,5 @@
+from fastapi import Depends
+from auth.dependencies import get_current_user
 from fastapi import APIRouter, HTTPException
 from sqlmodel import Session, select
 
@@ -11,9 +13,11 @@ router = APIRouter(
 
 
 @router.post("/{course_id}")
-def enroll_student(course_id: int):
-
-    student_id = 3
+def enroll_student(
+    course_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    student_id = current_user.id
 
     with Session(engine) as session:
 

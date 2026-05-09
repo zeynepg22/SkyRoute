@@ -1,3 +1,5 @@
+from fastapi import Depends
+from auth.dependencies import require_role
 from fastapi import APIRouter, HTTPException
 from sqlmodel import Session, select
 
@@ -33,7 +35,10 @@ def get_course(course_id: int):
 
 
 @router.post("/")
-def create_course(course: CourseCreate):
+def create_course(
+    course: CourseCreate,
+    current_user: User = Depends(require_role("instructor", "admin"))
+):
     with Session(engine) as session:
         instructor = session.get(User, course.instructor_id)
 
@@ -59,7 +64,11 @@ def create_course(course: CourseCreate):
 
 
 @router.put("/{course_id}")
-def update_course(course_id: int, updated_course: CourseUpdate):
+def update_course(
+    course_id: int,
+    updated_course: CourseUpdate,
+    current_user: User = Depends(require_role("instructor", "admin"))
+):
     with Session(engine) as session:
         course = session.get(Course, course_id)
 
@@ -89,7 +98,10 @@ def update_course(course_id: int, updated_course: CourseUpdate):
 
 
 @router.delete("/{course_id}")
-def delete_course(course_id: int):
+def delete_course(
+    course_id: int,
+    current_user: User = Depends(require_role("admin"))
+):
     with Session(engine) as session:
         course = session.get(Course, course_id)
 

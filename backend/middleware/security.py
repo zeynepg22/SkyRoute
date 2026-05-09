@@ -46,7 +46,17 @@ async def security_headers_middleware(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-    response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none'"
+    if request.url.path.startswith("/docs") or request.url.path.startswith("/redoc") or request.url.path.startswith("/openapi.json"):
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self' https://cdn.jsdelivr.net https://unpkg.com; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
+            "img-src 'self' data: https://fastapi.tiangolo.com; "
+            "font-src 'self' data: https://cdn.jsdelivr.net https://unpkg.com; "
+            "frame-ancestors 'none'"
+        )
+    else:
+        response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none'"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
 
