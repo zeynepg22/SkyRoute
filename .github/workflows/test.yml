@@ -1,26 +1,43 @@
-name: SkyRoute Backend Tests
+name: SkyRoute Full Stack Tests
 
 on: [push, pull_request]
 
 jobs:
-  test:
+  backend-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.13'
-
-      - name: Install dependencies
-        run: |
-          cd backend
-          pip install -r requirements.txt
-
-      - name: Run Pytest
+      - name: Run Backend Tests
         env:
           DATABASE_URL: sqlite:///:memory:
         run: |
           cd backend
+          pip install -r requirements.txt
           pytest
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm install
+      - name: Install Playwright Browsers
+        run: |
+          cd frontend
+          npx playwright install --with-deps chromium
+      - name: Run Playwright Tests
+        run: |
+          cd frontend
+          # Frontend sunucusunu arka planda başlat ve testleri koştur
+          npm run dev & 
+          npx playwright test tests/login.spec.js --project=chromium
