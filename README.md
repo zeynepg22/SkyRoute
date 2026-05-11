@@ -327,6 +327,26 @@ Alternative deployment infrastructure may also be used.
 
 ---
 
+# Screenshots
+
+## Login Page
+![Login Page](screenshots/login.png)
+
+## Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+## Courses Page
+![Courses 1](screenshots/courses1.png)
+
+![Courses 2](screenshots/courses2.png)
+
+![Courses 3](screenshots/courses3.png)
+
+## Course Detail
+![Course Detail 1](screenshots/coursesDetail.png)
+
+![Course Detail 2](screenshots/coursesDetail2.png)
+
 # Team Responsibilities
 
 | Area | Responsibility |
